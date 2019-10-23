@@ -1,0 +1,13 @@
+library
+- name
+- type_id
+- description
+- indication
+- control
+
+type
+- name
+
+image
+- library_id
+- name
