@@ -1,5 +1,7 @@
 @extends('app')
 
+@php $e = isset($model); @endphp
+
 @section('title', 'Library HPT');
 
 @section('style')
@@ -8,8 +10,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-end">
-	<span><b>Tambah Data Library HPT</b></span>
-	<a href="{{ route('libraries.create') }}" class="btn btn-sm btn-secondary"><i class="fas fa-angle-left"></i> Kembali</a>
+	<span><b>Form Library HPT</b></span>
+	<a href="{{ route('libraries.index') }}" class="btn btn-sm btn-secondary"><i class="fas fa-angle-left"></i> Kembali</a>
 </div>
 <hr>
 
@@ -17,32 +19,49 @@
 	<div class="col-md-8">
 		<form action="{{ $route }}" method="post" enctype="multipart/form-data">
 			@csrf
+			{{ $e ? method_field('PUT') : '' }}
 			<div class="form-group">
 				<label>Nama:</label>
-				<input type="text" class="form-control" name="name">
+				<input type="text" class="form-control" name="name" value="{{ $e ? $model->name : '' }}">
 			</div>
 			<div class="form-group">
 				<label>Tipe:</label>
 				<select class="form-control" name="type_id">
 					@foreach($type as $i => $t)
-					<option value="{{ $i }}">{{ $t }}</option>
+					<option {{ $e && $model->type_id == $i ? 'selected' : '' }} value="{{ $i }}">{{ $t }}</option>
 					@endforeach
 				</select>
 			</div>
 			<div class="form-group">
 				<label>Deskripsi:</label>
-				<textarea rows="4" class="form-control" name="description"></textarea>
+				<textarea rows="4" class="form-control" name="description">{{ $e ? $model->description : '' }}</textarea>
 			</div>
 			<div class="form-group">
 				<label>Gejala:</label>
-				<textarea rows="4" class="form-control" name="indication"></textarea>
+				<textarea rows="4" class="form-control" name="indication">{{ $e ? $model->indication : '' }}</textarea>
 			</div>
 			<div class="form-group">
 				<label>Pengendalian:</label>
-				<textarea rows="4" class="form-control" name="control"></textarea>
+				<textarea rows="4" class="form-control" name="control">{{ $e ? $model->control : '' }}</textarea>
 			</div>
 			<div class="form-group">
 				<label class="mr-5">Gambar:</label>
+
+					@if($e)
+					<div class="my-3">
+						<input type="hidden" name="deleted_image">
+						<p><small><b>Gambar Tersimpan:</b></small></p>
+						@foreach($model->images()->get() as $i => $image)
+						<div id="stored{{ $i+1 }}" class="mr-2" style="width: 200px; display: inline-block;">
+							<div class="fileinput-new img-thumbnail" style="width: 200px; height: 150px;display: inline-block;">
+						    <img src="{{ '/img/library/'.$image->thumbnail }}"  alt="..." style="width: 100%;">
+						  </div>
+						  <button onclick="delete_image({{ $i+1 }}, {{ $image->id }})" type="button" class="mt-2 btn btn-sm btn-block btn-outline-secondary">x</button>
+						</div>
+					  @endforeach
+						<p class="mt-3"><small><b>Gambar Baru:</b></small></p>
+					</div>
+				  @endif
 
 				<div class="form-wrapper d-flex align-items-start">
 
@@ -111,5 +130,12 @@
 		});
 
 	});
+
+	function delete_image(index, id) {
+		$('#stored'+index).remove();
+		var del = $('input[name=deleted_image]');
+
+		del.val( del.val() + ',' + id );
+	}
 </script>
 @endsection

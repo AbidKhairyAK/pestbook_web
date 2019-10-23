@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Model\Library;
 use App\Model\Type;
+use App\Model\Image;
 use App\Http\Resources\Library as LibraryResource;
-use Image;
+use Image as ImageIntervention;
 
 class LibraryController extends Controller
 {
@@ -53,7 +54,6 @@ class LibraryController extends Controller
     {
     	$data['type'] = Type::pluck('name', 'id');
     	$data['route'] = route('libraries.store');
-    	$data['method'] = 'post';
     	return view('library.form', $data);
     }
 
@@ -61,41 +61,86 @@ class LibraryController extends Controller
     {
     	$data['type'] = Type::pluck('name', 'id');
     	$data['model'] = Library::find($id);
-    	$data['route'] = route('library.update');
-    	$data['method'] = 'put';
+    	$data['route'] = route('libraries.update', $id);
     	return view('library.form', $data);
-    }
-
-    public function show($id)
-    {
-    	$data['model'] = Library::find($id);
-    	return view('library.detail', $data);
     }
 
     public function store(Request $request)
     {
-    	$images = $request->file('images');
-    	$path = public_path('img/library/');
+        $lib = Library::create($request->all());
 
-    	$lib = Library::create($request->all());
-
-    	for ($i=0; $i < count($images); $i++) { 
-    		$ext = $images[$i]->getClientOriginalExtension();
-    		$oriName = 'original-'.time().$i.'.'.$ext;
-    		$thumbName = 'thumbnail-'.time().$i.'.'.$ext;
-
-			$images[$i]->move($path, $oriName);
-
-			Image::make($path.$oriName)->widen(300, function ($constraint) {
-			    $constraint->upsize();
-			})->save($path.$thumbName);
-
-			$lib->images()->create([
-				'original' => $oriName,
-				'thumbnail' => $thumbName,
-			]);
-    	}
+        if ($images = $request->file('images')) {
+            $this->inputImage($images, $lib);
+        }
 
     	return redirect('libraries');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $lib = Library::find($id);
+        $lib->update($request->all());
+
+        if ($r = substr($request->deleted_image, 1)) {
+            $i = strpos($r, ',') ? explode(',', $r) : array('0' => $r);
+            foreach ($i as $img_id) {
+                $this->deleteImage($img_id);
+            }
+        }
+
+        if ($images = $request->file('images')) {
+            $this->inputImage($images, $lib);
+        }
+
+        return redirect('libraries');
+    }
+
+    public function destroy($id)
+    {
+        $lib = Library::find($id);
+
+        foreach ($lib->images()->get() as $img) {
+            $this->deleteImage($img->id);
+        }
+
+        $lib->delete();
+
+        return redirect('libraries');
+    }
+
+    public function inputImage($images, $lib)
+    {
+        $path = public_path('img/library/');
+
+        for ($i=0; $i < count($images); $i++) { 
+            $ext = $images[$i]->getClientOriginalExtension();
+            $oriName = 'original-'.time().$i.'.'.$ext;
+            $thumbName = 'thumbnail-'.time().$i.'.'.$ext;
+
+            $images[$i]->move($path, $oriName);
+
+            ImageIntervention::make($path.$oriName)->widen(300, function ($constraint) {
+                $constraint->upsize();
+            })->save($path.$thumbName);
+
+            $lib->images()->create([
+                'original' => $oriName,
+                'thumbnail' => $thumbName,
+            ]);
+        }
+    }
+
+    public function deleteImage($id)
+    {
+        $img = Image::find($id);
+
+        if (file_exists(public_path('img/library/'.$img->original))) {
+            unlink(public_path('img/library/'.$img->original));
+        }
+        if (file_exists(public_path('img/library/'.$img->thumbnail))) {
+            unlink(public_path('img/library/'.$img->thumbnail));
+        }
+
+        $img->delete();
     }
 }

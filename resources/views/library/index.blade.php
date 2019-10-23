@@ -32,7 +32,7 @@
 			<th width="100">Tipe</th>
 			<th width="120">Tgl Dibuat</th>
 			<th width="120">Tgl Diedit</th>
-			<th width="100">Opsi</th>
+			<th width="80">Opsi</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -45,9 +45,11 @@
 			<td>{{ substr($m->created_at,0,10) }}</td>
 			<td>{{ substr($m->updated_at,0,10) }}</td>
 			<td>
-				<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" title="detail"><i class="fas fa-fw fa-info"></i></a>
-				<a href="#" class="btn btn-sm btn-success" data-toggle="tooltip" title="edit"><i class="fas fa-fw fa-edit"></i></a>
-				<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" title="hapus"><i class="fas fa-fw fa-trash"></i></a>
+				<form method="post" action="{{ route('libraries.destroy', $m->id) }}" class="mb-0">
+					@csrf @method('DELETE')
+					<a href="{{ route('libraries.edit', $m->id) }}" class="btn btn-sm btn-success" data-toggle="tooltip" title="edit"><i class="fas fa-fw fa-edit"></i></a>
+					<button class="btn btn-sm btn-danger" data-toggle="tooltip" title="hapus"><i class="fas fa-fw fa-trash"></i></button>
+				</form>
 			</td>
 		</tr>
 		@endforeach
