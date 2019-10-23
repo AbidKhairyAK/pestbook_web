@@ -31,22 +31,15 @@
 <body>
 
 	<nav class="navbar navbar-expand-md bg-success navbar-dark shadow">
-	  <a class="navbar-brand" href="#"><b>Penyakit Tumbuhan</b></a>
+	  <a class="navbar-brand" href="{{ route('libraries.index') }}"><b>Penyakit Tumbuhan</b></a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
 	    <span class="navbar-toggler-icon"></span>
 	  </button>
 	  <div class="collapse navbar-collapse" id="collapsibleNavbar">
 	    <ul class="navbar-nav">
-	      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-          	<b>Library HPT</b>
-          </a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Hama</a>
-            <a class="dropdown-item" href="#">Penyakit</a>
-            <a class="dropdown-item" href="#">Abiotik</a>
-          </div>
-        </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="{{ route('libraries.index') }}"><b>Library HPT</b></a>
+	      </li>
 	      <li class="nav-item">
 	        <a class="nav-link" href="#"><b>Konsultasi</b></a>
 	      </li>
