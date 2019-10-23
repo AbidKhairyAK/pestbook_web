@@ -29,11 +29,17 @@ class LibraryController extends Controller
     	return view('library.index', $data);
     }
 
-    public function list($type)
+    public function list(Request $request, $type)
     {
         $data = Library::with('type', 'images')->whereHas('type', function($code) use($type) {
             $code->where('name', $type);
-        })->orderBy('name')->get();
+        })->orderBy('name');
+
+        if ($s = $request->get('s')) {
+            $data = $data->where('name', 'like', '%'.$s.'%');
+        }
+
+        $data = $data->get();
 
         return LibraryResource::collection($data);
     }
