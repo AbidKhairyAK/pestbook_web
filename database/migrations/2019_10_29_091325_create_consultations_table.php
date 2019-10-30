@@ -19,7 +19,8 @@ class CreateConsultationsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('title');
             $table->text('indication');
-            $table->string('image')->nullable();
+            $table->string('original', 30)->nullable();
+            $table->string('thumbnail', 30)->nullable();
             $table->boolean('status')->default(0);
             $table->text('answer')->nullable();
             $table->timestamps();

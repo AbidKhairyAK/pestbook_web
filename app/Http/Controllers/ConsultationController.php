@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Model\Consultation;
 use App\Model\Type;
-use App\Model\Image;
 use App\Http\Resources\Consultation as ConsultationResource;
 use Image as ImageIntervention;
 use Illuminate\Support\Facades\Storage;
@@ -69,16 +68,23 @@ class ConsultationController extends Controller
     public function store(Request $request)
     {
         $img = $request->image;
-        $imgName = 'question-'.time().'.'.str_replace('image/', '', $img['type']);
+        $imgOri = 'original-'.time().'.'.str_replace('image/', '', $img['type']);
+        $imgThumb = 'thumbnail-'.time().'.'.str_replace('image/', '', $img['type']);
 
-        Storage::disk('public_img')->put('consultation/'.$imgName, base64_decode($img['data']));
+        Storage::disk('public_img')->put('consultation/'.$imgOri, base64_decode($img['data']));
+
+        $path = public_path('img/consultation/');
+        ImageIntervention::make($path.$oriName)->widen(300, function ($constraint) {
+            $constraint->upsize();
+        })->save($path.$thumbName);
 
         Consultation::create([
             'title' => $request->title,
             'type_id' => $request->type_id,
             'user_id' => 1,
             'indication' => $request->indication,
-            'image' => $imgName,
+            'original' => $imgOri,
+            'thumbnail' => $imgThumb,
         ]);
         
         return response()->json([
@@ -98,8 +104,11 @@ class ConsultationController extends Controller
     {
         $cons = Consultation::find($id);
 
-        if (file_exists(public_path('img/consultation/'.$cons->image))) {
-            unlink(public_path('img/consultation/'.$cons->image));
+        if (file_exists(public_path('img/consultation/'.$cons->original))) {
+            unlink(public_path('img/consultation/'.$cons->original));
+        }
+        if (file_exists(public_path('img/consultation/'.$cons->thumbnail))) {
+            unlink(public_path('img/consultation/'.$cons->thumbnail));
         }
 
         $cons->delete();

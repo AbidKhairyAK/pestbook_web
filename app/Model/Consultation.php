@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Consultation extends Model
 {
     protected $fillable = [
-    	'user_id', 'type_id', 'title', 'indication', 'image', 'status', 'answer'
+    	'user_id', 'type_id', 'title', 'indication', 'original', 'thumbnail', 'status', 'answer'
     ];
 
     public function type()

@@ -21,6 +21,6 @@ class ImagesTableSeeder extends Seeder
     	}
 
         DB::table('images')->truncate();
-        // DB::table('images')->insert($data);
+        DB::table('images')->insert($data);
     }
 }
