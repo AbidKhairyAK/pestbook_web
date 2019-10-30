@@ -37,8 +37,8 @@
 			<div class="form-group">
 				<label><b>Gambar:</b></label>
 				<br>
-				<a href="/img/consultation/{{ $model->image }}" target="_blank" class="border p-2 rounded d-inline-block">
-					<img src="/img/consultation/{{ $model->image }}" alt="gambar konsultasi" style="width: 100px;">
+				<a href="/img/consultation/{{ $model->original }}" target="_blank" class="border p-2 rounded d-inline-block">
+					<img src="/img/consultation/{{ $model->thumbnail }}" alt="gambar konsultasi" style="width: 100px;">
 				</a>
 			</div>
 			<div class="form-group">
