@@ -41,7 +41,7 @@
 	        <a class="nav-link" href="{{ route('libraries.index') }}"><b>Library HPT</b></a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#"><b>Konsultasi</b></a>
+	        <a class="nav-link" href="{{ route('consultations.index') }}"><b>Konsultasi</b></a>
 	      </li>
 	    </ul>
 	  </div>  

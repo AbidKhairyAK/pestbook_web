@@ -31,6 +31,6 @@ class LibrariesTableSeeder extends Seeder
     	}
 
     	DB::table('libraries')->truncate();
-    	// DB::table('libraries')->insert($data);
+    	DB::table('libraries')->insert($data);
     }
 }

@@ -6,6 +6,13 @@
 
 @section('style')
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.css"/>
+<style type="text/css">
+	.CodeMirror, .CodeMirror-scroll{
+		min-height: 200px;
+		max-height: 200px;
+	}
+</style>
 @endsection
 
 @section('content')
@@ -17,16 +24,16 @@
 
 <div class="row">
 	<div class="col-md-8">
-		<form action="{{ $route }}" method="post" enctype="multipart/form-data">
+		<form action="{{ $route }}" method="post" enctype="multipart/form-data" id="form">
 			@csrf
 			{{ $e ? method_field('PUT') : '' }}
 			<div class="form-group">
 				<label>Nama:</label>
-				<input type="text" class="form-control" name="name" value="{{ $e ? $model->name : '' }}">
+				<input type="text" class="form-control" name="name" value="{{ $e ? $model->name : '' }}" required>
 			</div>
 			<div class="form-group">
 				<label>Tipe:</label>
-				<select class="form-control" name="type_id">
+				<select class="form-control" name="type_id" required>
 					@foreach($type as $i => $t)
 					<option {{ $e && $model->type_id == $i ? 'selected' : '' }} value="{{ $i }}">{{ $t }}</option>
 					@endforeach
@@ -53,7 +60,7 @@
 						<p><small><b>Gambar Tersimpan:</b></small></p>
 						@foreach($model->images()->get() as $i => $image)
 						<div id="stored{{ $i+1 }}" class="mr-2" style="width: 200px; display: inline-block;">
-							<div class="fileinput-new img-thumbnail" style="width: 200px; height: 150px;display: inline-block;">
+							<div class="fileinput-new img-thumbnail" style="width: 200px; height: 150px;display: inline-block; overflow: hidden;">
 						    <img src="{{ '/img/library/'.$image->thumbnail }}"  alt="..." style="width: 100%;">
 						  </div>
 						  <button onclick="delete_image({{ $i+1 }}, {{ $image->id }})" type="button" class="mt-2 btn btn-sm btn-block btn-outline-secondary">x</button>
@@ -99,8 +106,26 @@
 
 @section('script')
 <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/js/jasny-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
+
+		var description_mde = new SimpleMDE({ element: $("textarea[name=description]")[0], spellChecker: false });
+		var indication_mde = new SimpleMDE({ element: $("textarea[name=indication]")[0], spellChecker: false });
+		var control_mde = new SimpleMDE({ element: $("textarea[name=control]")[0], spellChecker: false });
+
+		@if($e)
+			description_mde.value(`{{ $model->description }}`);
+			indication_mde.value(`{{ $model->indication }}`);
+			control_mde.value(`{{ $model->control }}`);
+		@endif
+
+		$('#form').submit(function(e) {
+			if (description_mde.value() == '' || indication_mde.value() == '' || control_mde.value() == '') {
+				alert('Kolom Deskripsi, Gejala, dan Pengendalian tidak boleh kosong!');
+				e.preventDefault();
+			}
+		})
 
 		$('#new-image').click(function() {
 			var current = parseInt($('.fileinput:first-child').attr('id').replace('item', ''));

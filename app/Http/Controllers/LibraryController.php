@@ -53,7 +53,12 @@ class LibraryController extends Controller
 
     public function image($img)
     {
-    	return response()->file(public_path('img/library/').$img);
+        $file = public_path('img/library/').$img;
+        if (file_exists($file)) {
+            return response()->file($file);
+        } else {
+            return response()->file('img/default.png');
+        }
     }
 
     public function create()
