@@ -96,50 +96,14 @@ class ConsultationController extends Controller
 
     public function destroy($id)
     {
-        $lib = Consultation::find($id);
+        $cons = Consultation::find($id);
 
-        foreach ($lib->images()->get() as $img) {
-            $this->deleteImage($img->id);
+        if (file_exists(public_path('img/consultation/'.$cons->image))) {
+            unlink(public_path('img/consultation/'.$cons->image));
         }
 
-        $lib->delete();
+        $cons->delete();
 
         return redirect('consultations');
-    }
-
-    public function inputImage($images, $lib)
-    {
-        $path = public_path('img/consultation/');
-
-        for ($i=0; $i < count($images); $i++) { 
-            $ext = $images[$i]->getClientOriginalExtension();
-            $oriName = 'original-'.time().$i.'.'.$ext;
-            $thumbName = 'thumbnail-'.time().$i.'.'.$ext;
-
-            $images[$i]->move($path, $oriName);
-
-            ImageIntervention::make($path.$oriName)->widen(300, function ($constraint) {
-                $constraint->upsize();
-            })->save($path.$thumbName);
-
-            $lib->images()->create([
-                'original' => $oriName,
-                'thumbnail' => $thumbName,
-            ]);
-        }
-    }
-
-    public function deleteImage($id)
-    {
-        $img = Image::find($id);
-
-        if (file_exists(public_path('img/consultation/'.$img->original))) {
-            unlink(public_path('img/consultation/'.$img->original));
-        }
-        if (file_exists(public_path('img/consultation/'.$img->thumbnail))) {
-            unlink(public_path('img/consultation/'.$img->thumbnail));
-        }
-
-        $img->delete();
     }
 }
