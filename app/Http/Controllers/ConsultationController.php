@@ -74,9 +74,9 @@ class ConsultationController extends Controller
         Storage::disk('public_img')->put('consultation/'.$imgOri, base64_decode($img['data']));
 
         $path = public_path('img/consultation/');
-        ImageIntervention::make($path.$oriName)->widen(300, function ($constraint) {
+        ImageIntervention::make($path.$imgOri)->widen(300, function ($constraint) {
             $constraint->upsize();
-        })->save($path.$thumbName);
+        })->save($path.$imgThumb);
 
         Consultation::create([
             'title' => $request->title,
