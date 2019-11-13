@@ -32,9 +32,14 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json(['error' => 'Email sudah terpakai'], 403);
+        }
+
         User::create([
         	'name' => $request->name,
-        	'email' => $request->email,
+            'email' => $request->email,
+        	'phone' => $request->phone,
         	'password' => bcrypt($request->password),
         ]);
 

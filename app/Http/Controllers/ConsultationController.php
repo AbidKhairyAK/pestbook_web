@@ -8,9 +8,15 @@ use App\Model\Type;
 use App\Http\Resources\Consultation as ConsultationResource;
 use Image as ImageIntervention;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ConsultationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['only' => ['list', 'detail', 'save']]);
+    }
+
     public function index(Request $request)
     {
         $type = $request->get('type');
@@ -31,7 +37,7 @@ class ConsultationController extends Controller
 
     public function list()
     {
-        $data = Consultation::select('id', 'title', 'status')->orderBy('created_at', 'desc')->get();
+        $data = Consultation::select('id', 'title', 'status', 'user_id')->where('user_id', $this->guard()->user()->id)->orderBy('created_at', 'desc')->get();
 
         return ConsultationResource::collection($data);
     }
@@ -65,26 +71,29 @@ class ConsultationController extends Controller
     	return view('consultation.form', $data);
     }
 
-    public function store(Request $request)
+    public function save(Request $request)
     {
         $img = $request->image;
-        $imgOri = 'original-'.time().'.'.str_replace('image/', '', $img['type']);
-        $imgThumb = 'thumbnail-'.time().'.'.str_replace('image/', '', $img['type']);
 
-        Storage::disk('public_img')->put('consultation/'.$imgOri, base64_decode($img['data']));
+        if ($img) {
+            $imgOri = 'original-'.time().'.'.str_replace('image/', '', $img['type']);
+            $imgThumb = 'thumbnail-'.time().'.'.str_replace('image/', '', $img['type']);
 
-        $path = public_path('img/consultation/');
-        ImageIntervention::make($path.$imgOri)->widen(300, function ($constraint) {
-            $constraint->upsize();
-        })->save($path.$imgThumb);
+            Storage::disk('public_img')->put('consultation/'.$imgOri, base64_decode($img['data']));
+
+            $path = public_path('img/consultation/');
+            ImageIntervention::make($path.$imgOri)->widen(300, function ($constraint) {
+                $constraint->upsize();
+            })->save($path.$imgThumb);
+        }
 
         Consultation::create([
             'title' => $request->title,
             'type_id' => $request->type_id,
-            'user_id' => 1,
+            'user_id' => $this->guard()->user()->id,
             'indication' => $request->indication,
-            'original' => $imgOri,
-            'thumbnail' => $imgThumb,
+            'original' => $img ? $imgOri : null,
+            'thumbnail' => $img ? $imgThumb : null,
         ]);
         
         return response()->json([
@@ -114,5 +123,10 @@ class ConsultationController extends Controller
         $cons->delete();
 
         return redirect('consultations');
+    }
+
+    public function guard()
+    {
+        return Auth::guard();
     }
 }

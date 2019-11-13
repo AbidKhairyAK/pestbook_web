@@ -17,7 +17,4 @@ Route::get('/libraries/list/{type}', 'LibraryController@list');
 Route::get('/libraries/detail/{id}', 'LibraryController@detail');
 Route::resource('/libraries', 'LibraryController');
 
-Route::get('/consultations/image/{img}', 'ConsultationController@image');
-Route::get('/consultations/list', 'ConsultationController@list');
-Route::get('/consultations/detail/{id}', 'ConsultationController@detail');
 Route::resource('/consultations', 'ConsultationController');

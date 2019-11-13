@@ -13,20 +13,20 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('/consultations/store', 'ConsultationController@store');
 
-Route::group([
+Route::get('/consultations/image/{img}', 'ConsultationController@image');
 
-    'middleware' => 'api',
-    'prefix' => 'auth'
+Route::group(['middleware' => 'api'], function() {
+	Route::post('/consultations/save', 'ConsultationController@save');
+	Route::post('/consultations/list', 'ConsultationController@list');
+	Route::post('/consultations/detail/{id}', 'ConsultationController@detail');
 
-], function ($router) {
-
-    Route::post('test', 'AuthController@test');
-    Route::post('register', 'AuthController@register');
-    Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
-    Route::post('me', 'AuthController@me');
-
+	Route::group(['prefix' => 'auth'], function () {
+	    Route::post('register', 'AuthController@register');
+	    Route::post('login', 'AuthController@login');
+	    Route::post('logout', 'AuthController@logout');
+	    Route::post('refresh', 'AuthController@refresh');
+	    Route::post('me', 'AuthController@me');
+	});
 });
+
