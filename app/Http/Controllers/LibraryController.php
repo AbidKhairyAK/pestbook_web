@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Model\Library;
 use App\Model\Type;
 use App\Model\Image;
+use App\Model\Notification;
 use App\Http\Resources\Library as LibraryResource;
 use Image as ImageIntervention;
+use OneSignal;
 
 class LibraryController extends Controller
 {
@@ -84,6 +86,26 @@ class LibraryController extends Controller
             $this->inputImage($images, $lib);
         }
 
+        $title = "Data baru tipe {$lib->type->name} telah ditambahkan ke library!";
+        $body = "Data baru telah ditambahkan ke library dengan detail: \n
+                nama: {$lib->name} 
+                tipe: {$lib->type->name} 
+                waktu: {$lib->created_at}";
+
+        $notf = Notification::create([
+            'user_id'   => null,
+            'title'     => $title,
+            'body'      => $body,
+            'type'      => 'library',
+            'target'    => $lib->id,
+        ]);
+
+        OneSignal::sendNotificationToAll(
+            $title,
+            null,
+            ['target' => $lib->id, 'type' => 'library']
+        );
+
     	return redirect('libraries');
     }
 
@@ -102,6 +124,26 @@ class LibraryController extends Controller
         if ($images = $request->file('images')) {
             $this->inputImage($images, $lib);
         }
+
+        $title = "Terdapat update data tipe {$lib->type->name} pada library!";
+        $body = "Terdapat update data pada library pada data: \n
+                nama: {$lib->name} \n
+                tipe: {$lib->type->name} \n
+                ";
+
+        $notf = Notification::create([
+            'user_id'   => null,
+            'title'     => $title,
+            'body'      => $body,
+            'type'      => 'library',
+            'target'    => $id,
+        ]);
+
+        OneSignal::sendNotificationToAll(
+            $title,
+            null,
+            ['target' => $id, 'type' => 'library']
+        );
 
         return redirect('libraries');
     }

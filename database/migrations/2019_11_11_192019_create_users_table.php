@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('phone', 30);
             $table->string('password');
+            $table->string('onesignal_id', 50)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

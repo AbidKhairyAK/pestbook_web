@@ -18,7 +18,7 @@ class ConsultationsTableSeeder extends Seeder
         for ($i=1; $i <= 30; $i++) { 
         	$s = rand(0, 1);
 	        $data[] = [
-        		'user_id' => 1,
+        		'user_id' => ($i % 2) ? 2 : 1,
         		'type_id' => rand(1, 3),
         		'title' => $faker->sentence().'?',
         		'indication' => $faker->paragraph(),

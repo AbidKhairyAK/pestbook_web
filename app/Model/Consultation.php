@@ -15,8 +15,8 @@ class Consultation extends Model
     	return $this->belongsTo(Type::class);
     }
 
-    // public function user()
-    // {
-    // 	return $this->belongsTo(User::class);
-    // }
+    public function user()
+    {
+    	return $this->belongsTo(\App\User::class);
+    }
 }

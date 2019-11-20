@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'test', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'test', 'register', 'onesignal']]);
     }
 
     public function test()
@@ -44,6 +44,11 @@ class AuthController extends Controller
         ]);
 
         return response()->json(['msg' => 'success']);
+    }
+
+    public function onesignal($onesignal_id)
+    {
+        User::find($this->guard()->user()->id)->update(['onesignal_id' => $onesignal_id]);
     }
 
     public function me()

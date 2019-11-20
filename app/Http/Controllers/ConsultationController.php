@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Model\Consultation;
 use App\Model\Type;
+use App\Model\Notification;
 use App\Http\Resources\Consultation as ConsultationResource;
 use Image as ImageIntervention;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use OneSignal;
 
 class ConsultationController extends Controller
 {
@@ -103,8 +105,29 @@ class ConsultationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $lib = Consultation::find($id);
-        $lib->update(['status' => 1, 'answer' => $request->answer]);
+        $cons = Consultation::find($id);
+        $cons->update(['status' => 1, 'answer' => $request->answer]);
+
+        $title = "Pertanyaan tentang {$cons->type->name} telah terjawab!";
+        $body = "Detail pertanyaan anda telah terjawab: \n 
+                judul : {$cons->title} 
+                tipe : {$cons->type->name} 
+                waktu : ".date('Y-m-d H:i:s');
+
+        $notf = Notification::create([
+            'user_id'   => $cons->user_id,
+            'title'     => $title,
+            'body'      => $body,
+            'type'      => 'consultation',
+            'target'    => $id,
+        ]);
+
+        OneSignal::sendNotificationToUser(
+            $title, 
+            $cons->user->onesignal_id,
+            null,
+            ['target' => $id, 'type' => 'consultation']
+        );
 
         return redirect('consultations');
     }
