@@ -15,11 +15,15 @@ class CreateLibrariesTable extends Migration
     {
         Schema::create('libraries', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->unsignedTinyInteger('type_id');
+            $table->string('name');
             $table->text('description');
             $table->text('indication');
             $table->text('control');
+            $table->string('name_en');
+            $table->text('description_en');
+            $table->text('indication_en');
+            $table->text('control_en');
             $table->timestamps();
         });
     }

@@ -17,7 +17,7 @@ class NotificationController extends Controller
     {
         $limit = $request->get('limit');
 
-    	$notf = Notification::where('user_id', $this->guard()->user()->id)->orWhereNull('user_id')->orderBy('created_at', 'desc')->skip(0)->take($limit)->get();
+    	$notf = Notification::where('user_id', $this->guard()->user()->id)->orderBy('created_at', 'desc')->skip(0)->take($limit)->get();
 
     	return response()->json($notf);
     }

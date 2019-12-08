@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Library HPT');
+@section('title', 'Library HPT')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-end">

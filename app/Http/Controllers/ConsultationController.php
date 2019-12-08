@@ -114,10 +114,26 @@ class ConsultationController extends Controller
                 tipe : {$cons->type->name} 
                 waktu : ".date('Y-m-d H:i:s');
 
+
+        $engtype = [
+            'hama' => 'pest',
+            'penyakit' => 'disease',
+            'abiotik' => 'abiotic',
+        ];
+        $type = $engtype[$lib->type->name];
+
+        $title_en = "Pertanyaan tentang {$type} telah terjawab!";
+        $body_en = "Detail pertanyaan anda telah terjawab: \n 
+                judul : {$cons->title} 
+                tipe : {$type} 
+                waktu : ".date('Y-m-d H:i:s');
+
         $notf = Notification::create([
             'user_id'   => $cons->user_id,
             'title'     => $title,
             'body'      => $body,
+            'title_en'  => $title_en,
+            'body_en'   => $body_en,
             'type'      => 'consultation',
             'target'    => $id,
         ]);

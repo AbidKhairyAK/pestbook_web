@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 use App\Model\Library;
 use App\Model\Type;
 use App\Model\Image;
@@ -38,7 +39,7 @@ class LibraryController extends Controller
         })->orderBy('name');
 
         if ($s = $request->get('s')) {
-            $data = $data->where('name', 'like', '%'.$s.'%');
+            $data = $data->where('name', 'like', '%'.$s.'%')->orWhere('name_en', 'like', '%'.$s.'%');
         }
 
         $data = $data->get();
@@ -92,13 +93,31 @@ class LibraryController extends Controller
                 tipe: {$lib->type->name} 
                 waktu: {$lib->created_at}";
 
-        $notf = Notification::create([
-            'user_id'   => null,
-            'title'     => $title,
-            'body'      => $body,
-            'type'      => 'library',
-            'target'    => $lib->id,
-        ]);
+        $engtype = [
+            'hama' => 'pest',
+            'penyakit' => 'disease',
+            'abiotik' => 'abiotic',
+        ];
+        $type = $engtype[$lib->type->name];
+
+        $title_en = "New data of type {$type} has been added to the library!";
+        $body_en = "New data has been added to the library with details: \n
+                nama: {$lib->name_en} 
+                tipe: {$type} 
+                waktu: {$lib->created_at}";
+
+        $users = User::pluck('id');
+        foreach ($users as $user_id) {
+            $notf = Notification::create([
+                'user_id'   => $user_id,
+                'title'     => $title,
+                'body'      => $body,
+                'title_en'  => $title_en,
+                'body_en'   => $body_en,
+                'type'      => 'library',
+                'target'    => $lib->id,
+            ]);
+        }
 
         OneSignal::sendNotificationToAll(
             $title,
@@ -129,15 +148,33 @@ class LibraryController extends Controller
         $body = "Terdapat update data pada library pada data: \n
                 nama: {$lib->name} \n
                 tipe: {$lib->type->name} \n
-                ";
+                waktu: {$lib->updated_at}";
 
-        $notf = Notification::create([
-            'user_id'   => null,
-            'title'     => $title,
-            'body'      => $body,
-            'type'      => 'library',
-            'target'    => $id,
-        ]);
+        $engtype = [
+            'hama' => 'pest',
+            'penyakit' => 'disease',
+            'abiotik' => 'abiotic',
+        ];
+        $type = $engtype[$lib->type->name];
+
+        $title_en = "There is an update to the data of type {$type} has been added to the library!";
+        $body_en = "The data has been updated with details: \n
+                nama: {$lib->name_en} 
+                tipe: {$type} 
+                waktu: {$lib->updated_at}";
+
+        $users = User::pluck('id');
+        foreach ($users as $user_id) {
+            $notf = Notification::create([
+                'user_id'   => $user_id,
+                'title'     => $title,
+                'body'      => $body,
+                'title_en'  => $title_en,
+                'body_en'   => $body_en,
+                'type'      => 'library',
+                'target'    => $id,
+            ]);
+        }
 
         OneSignal::sendNotificationToAll(
             $title,

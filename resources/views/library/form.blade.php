@@ -2,7 +2,7 @@
 
 @php $e = isset($model); @endphp
 
-@section('title', 'Library HPT');
+@section('title', 'Library HPT')
 
 @section('style')
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/4.0.0/css/jasny-bootstrap.min.css">
@@ -22,15 +22,12 @@
 </div>
 <hr>
 
-<div class="row">
-	<div class="col-md-8">
-		<form action="{{ $route }}" method="post" enctype="multipart/form-data" id="form">
-			@csrf
-			{{ $e ? method_field('PUT') : '' }}
-			<div class="form-group">
-				<label>Nama:</label>
-				<input type="text" class="form-control" name="name" value="{{ $e ? $model->name : '' }}" required>
-			</div>
+<form action="{{ $route }}" method="post" enctype="multipart/form-data" id="form">
+	@csrf
+	{{ $e ? method_field('PUT') : '' }}
+
+	<div class="row">
+		<div class="col-md-12">
 			<div class="form-group">
 				<label>Tipe:</label>
 				<select class="form-control" name="type_id" required>
@@ -38,6 +35,14 @@
 					<option {{ $e && $model->type_id == $i ? 'selected' : '' }} value="{{ $i }}">{{ $t }}</option>
 					@endforeach
 				</select>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<h6><b>Versi Indonesia</b></h6>
+			<div class="form-group">
+				<label>Nama:</label>
+				<input type="text" class="form-control" name="name" value="{{ $e ? $model->name : '' }}" required>
 			</div>
 			<div class="form-group">
 				<label>Deskripsi:</label>
@@ -51,6 +56,29 @@
 				<label>Pengendalian:</label>
 				<textarea rows="4" class="form-control" name="control">{{ $e ? $model->control : '' }}</textarea>
 			</div>
+		</div>
+
+		<div class="col-md-6">
+			<h6><b>Versi Inggris</b> <sup class="text-muted">(opsional)</sup></h6>
+			<div class="form-group">
+				<label>Name:</label>
+				<input type="text" class="form-control" name="name_en" value="{{ $e ? $model->name_en : '' }}" required>
+			</div>
+			<div class="form-group">
+				<label>Description:</label>
+				<textarea rows="4" class="form-control" name="description_en">{{ $e ? $model->description_en : '' }}</textarea>
+			</div>
+			<div class="form-group">
+				<label>Indication:</label>
+				<textarea rows="4" class="form-control" name="indication_en">{{ $e ? $model->indication_en : '' }}</textarea>
+			</div>
+			<div class="form-group">
+				<label>Control:</label>
+				<textarea rows="4" class="form-control" name="control_en">{{ $e ? $model->control_en : '' }}</textarea>
+			</div>
+		</div>
+
+		<div class="col-md-12">
 			<div class="form-group">
 				<label class="mr-5">Gambar:</label>
 
@@ -99,9 +127,10 @@
 
 			<br>
 			<button type="submit" class="btn btn-success btn-block btn-lg mt-3 float-right"><b>Submit</b></button>
-		</form>
+		</div>
 	</div>
-</div>
+</form>
+
 @endsection
 
 @section('script')
@@ -114,10 +143,18 @@
 		var indication_mde = new SimpleMDE({ element: $("textarea[name=indication]")[0], spellChecker: false });
 		var control_mde = new SimpleMDE({ element: $("textarea[name=control]")[0], spellChecker: false });
 
+		var description_en_mde = new SimpleMDE({ element: $("textarea[name=description_en]")[0], spellChecker: false });
+		var indication_en_mde = new SimpleMDE({ element: $("textarea[name=indication_en]")[0], spellChecker: false });
+		var control_en_mde = new SimpleMDE({ element: $("textarea[name=control_en]")[0], spellChecker: false });
+
 		@if($e)
 			description_mde.value(`{{ $model->description }}`);
 			indication_mde.value(`{{ $model->indication }}`);
 			control_mde.value(`{{ $model->control }}`);
+
+			description_en_mde.value(`{{ $model->description_en }}`);
+			indication_en_mde.value(`{{ $model->indication_en }}`);
+			control_en_mde.value(`{{ $model->control_en }}`);
 		@endif
 
 		$('#form').submit(function(e) {
